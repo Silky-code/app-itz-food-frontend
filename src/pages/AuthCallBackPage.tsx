@@ -12,7 +12,7 @@ export default function AuthCallBackPage() {
     
     useEffect(() =>{
         if (user?.sub && user?.email && !hasCreatedUser.current) {
-            createUserRequest.mutate({auth0Id: user.sub, email: user.email});
+            createUserRequest.mutate({auth0Id:user.sub, email: user.email});
             hasCreatedUser.current=true;
         }
         navigate("/");

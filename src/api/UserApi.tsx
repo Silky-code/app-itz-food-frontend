@@ -4,12 +4,17 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useAuth0 } from "@auth0/auth0-react"; 
 import { toast } from "sonner";
 
+type CreateUserRequest = {
+    email: string;
+    auth0Id: string;
+}
+
 
 export function useCreateUser () {
     const queryClient = useQueryClient();
     const { getAccessTokenSilently } = useAuth0();
 
-    const createUserRequest = async (formData: UpdateUser) => {
+    const createUserRequest = async (formData: CreateUserRequest) => {
         const accessToken = await getAccessTokenSilently();
         const res = await fetch(API_BASE_URL + "/api/user", {
             method: "POST",
@@ -26,7 +31,7 @@ export function useCreateUser () {
     };
 
     return useMutation({
-        mutationFn: (user: UpdateUser) => createUserRequest(user), 
+        mutationFn: (user: CreateUserRequest) => createUserRequest(user), 
         onError: (err) => {
             console.error(err);
             toast.error(err.toString())
