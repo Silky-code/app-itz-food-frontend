@@ -32,7 +32,7 @@ export default function ManageRestaurantForm({onSave,isLoading, restaurante}: Pr
             menuItems: [{name: "", price:"0.00"}],
         }
     });
-    
+ 
     useEffect( () => {
         if (!restaurante)
             return;
