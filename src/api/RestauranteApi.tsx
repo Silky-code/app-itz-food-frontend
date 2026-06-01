@@ -102,7 +102,7 @@ export function useUpdateRestaurante(){
     })
 }// funcion useupdaterestaurantes
 
-export const useSearchRestarantes = (searchState: SearchState, city?: string) =>{
+export const useSearchRestaurantes = (searchState: SearchState, city?: string) =>{
     const getSearchRestauranteRequest = async (searchState: SearchState):Promise<RestauranteSearchResponse>=>{
         const params = new URLSearchParams();
         params.set("searchQuery", searchState.searchQuery);
@@ -132,3 +132,24 @@ export const useSearchRestarantes = (searchState: SearchState, city?: string) =>
         enabled: !!city,
     });// fin de useQuery
 }//fin de useSearchRestaurantes
+
+export const useGetRestauranteById = (restaurantId?: string)=>{
+    const getRestaurantByIdRequest = async (): Promise<Restaurante>=>{
+
+        const url = API_BASE_URL
+                    +'/api/restaurante/'
+                    + restaurantId
+        const response = await fetch(url);
+
+        if (!response.ok){
+            throw new Error("Error al obtener el restaurante");
+        }
+        return response.json();
+    }
+
+    return useQuery({
+        queryKey: ['fetchRestaurant'],
+        queryFn: getRestaurantByIdRequest,
+        enabled: !!restaurantId,
+    })
+}

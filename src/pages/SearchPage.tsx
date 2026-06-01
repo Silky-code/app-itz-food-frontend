@@ -1,9 +1,9 @@
-import { useSearchRestarantes } from "@/api/RestauranteApi";
+import { useSearchRestaurantes } from "@/api/RestauranteApi";
 import CuisinesFilter from "@/components/CuisinesFilter";
 import LoadingButton from "@/components/LoadingButton";
 import PaginationSelector from "@/components/Search/PaginationSelector";
 import type {SearchForm} from '@/components/Search/SearchBar'
-import SortOptionsDropdown from "@/components/Search/SortOptionsDropDown";
+import SortOptionsDropdown from "@/components/Search/SortOptionsDropdown";
 import SearchBar from "@/components/Search/SearchBar";
 import SearchResultCard from "@/components/Search/SearchResultCard";
 import SearchResultsInfo from "@/components/Search/SearchResultsInfo";
@@ -21,7 +21,7 @@ export default function SearchPage() {
     const { city } = useParams();
     const [searchState, setSearchState] = useState<SearchState>({searchQuery:"",page: 1,selectedCuisines:[],sortOptions: "bestMatch"});
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
-    const {data:results, isLoading} = useSearchRestarantes(searchState, city);
+    const {data:results, isLoading} = useSearchRestaurantes(searchState, city);
 
     // funcion setSortOptions
     const setSortOptions = (sortOptions: string)=>{

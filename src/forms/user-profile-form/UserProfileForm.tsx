@@ -23,9 +23,11 @@ export type UserFormData = z.infer<typeof formSchema>;
 type Props = {
     onSave: (userProfileData: UserFormData) => void;
     getUser: BackEndUser
+    title?: string;
+    buttonText?: string;
 }
 
-export default function UserProfileForm({ onSave, getUser }: Props) {
+export default function UserProfileForm({ onSave, getUser, title="Formulario de perfil de usuario", buttonText="Actualizar" }: Props) {
     const form = useForm<UserFormData>({
         defaultValues: {
             name: '',
@@ -48,7 +50,7 @@ export default function UserProfileForm({ onSave, getUser }: Props) {
         <Card>
             <form id="user-profile-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 bg-gray-50 rounded-lg md:p-10">
                 <CardHeader>
-                    <CardTitle>Perfil del Usuario</CardTitle>
+                    <CardTitle>{title}</CardTitle>
                     <CardDescription>Consulta y cambia la informacion de tu perfil aqui</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -110,8 +112,8 @@ export default function UserProfileForm({ onSave, getUser }: Props) {
                     </div>
 
                     <CardFooter className="px-0 pt-6">
-                        <Button type="submit" className="bg-orange-500 text-white w-full md:w-auto">
-                            Guardar Cambios
+                        <Button type="submit" form="user-profile-form" className="bg-orange-500 text-white w-full md:w-auto">
+                            {buttonText}
                         </Button>
                     </CardFooter>
                 </CardContent>
