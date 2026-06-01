@@ -10,6 +10,18 @@ export default function MobileNavLinks(){
             className="flex items-center px-3 font-bold hover:text-orange-500 mx-4">
             Perfil
        </Link>
+       <Link 
+        to="/order-status" 
+        className="flex bg-white items-center font-bold hover:text-orange-500"
+      >
+        Ordenes
+      </Link>
+      <Link 
+        to="/manage-restaurant" 
+        className="flex bg-white items-center font-bold hover:text-orange-500"
+      >
+        Administrar Restaurante
+      </Link>
        <Button onClick={() => logout()}
         className="flex items-center px-3 font-bold hover:text-orange-500 mx-4">
             Cerrar Sesión
