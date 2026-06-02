@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, useQuery} from '@tanstack/react-query';
 import { useAuth0} from '@auth0/auth0-react';
 import { toast} from 'sonner';
-import type {Restaurante, RestauranteSearchResponse} from '@/api/types';
+import type {Restaurante, RestauranteSearchResponse, UpdateOrderStatusRequest} from '@/api/types';
 import type {SearchState} from '@/pages/SearchPage'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -68,39 +68,56 @@ export function useCreateRestaurante(){
 }// fin de useCreateRestaurante
 
 //hook para actualizar un restarante
-export function useUpdateRestaurante(){
-    const queryClient = useQueryClient();
-    const {getAccessTokenSilently} = useAuth0();
-
-    //funcion para actualizar un restaurante en el backend
-    const updateRestauranteRequest = async (restaurantFormData: FormData): Promise<Restaurante> =>{
-        const accessToken = await getAccessTokenSilently();
-        const res = await fetch(API_BASE_URL + '/api/restaurante', {
-            method: 'PUT',
-            headers: {
-                Authorization: 'Bearer ' + accessToken,
-            },
-            body: restaurantFormData
-        });
-        if (!res.ok){
-            throw new Error("Error al actualizar el restaurante")
-        }
-        return res.json()
-    }// fin de updateRestauranteRequest
-
-    return useMutation({
-        mutationFn: (formData: FormData)=>updateRestauranteRequest(formData),
-        onError: (err)=>{
-            toast.error(err.toString());
-            console.log(err);
-            throw new Error("Error al actualizar el restaurante")
+export const useUpdateRestauranteOrder = () => {
+  const { getAccessTokenSilently } = useAuth0();
+  const queryClient = useQueryClient();
+ 
+  const updateRestauranteOrderRequest = async (
+    updateStatusOrderRequest: UpdateOrderStatusRequest
+  ) => {
+    const accessToken = await getAccessTokenSilently();
+ 
+    const response = await fetch(
+      `${API_BASE_URL}/api/order/${updateStatusOrderRequest.orderId}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
         },
-        onSuccess: ()=>{
-            toast.success("Restaurante actualizado exitosamente")
-            queryClient.invalidateQueries({queryKey: ['restaurante']});
-        }
-    })
-}// funcion useupdaterestaurantes
+        body: JSON.stringify({ status: updateStatusOrderRequest.status }),
+      }
+    );
+ 
+    if (!response.ok) {
+      throw new Error("Failed to update status");
+    }
+ 
+    return response.json();
+  };
+ 
+  const {
+    mutateAsync: updateRestauranteOrder,
+    isPending,
+    isError,
+    isSuccess,
+    reset,
+  } = useMutation({
+    mutationFn: updateRestauranteOrderRequest,
+    onSuccess: () => {
+      toast.success("Order updated");
+      // Invalidar queries para refrescar datos
+      queryClient.invalidateQueries({ queryKey: ["fetchRestaurantOrders"] });
+    },
+    onError: () => {
+      toast.error("Unable to update order");
+      reset();
+    },
+  });
+ 
+  return { updateRestauranteOrder, isPending };
+};
+ 
 
 export const useSearchRestaurantes = (searchState: SearchState, city?: string) =>{
     const getSearchRestauranteRequest = async (searchState: SearchState):Promise<RestauranteSearchResponse>=>{
@@ -152,4 +169,35 @@ export const useGetRestauranteById = (restaurantId?: string)=>{
         queryFn: getRestaurantByIdRequest,
         enabled: !!restaurantId,
     })
+}
+export function useUpdateRestaurante() {
+    const queryClient = useQueryClient();
+    const { getAccessTokenSilently } = useAuth0();
+
+    const updateRestauranteRequest = async (restaurantFormData: FormData): Promise<Restaurante> => {
+        const accessToken = await getAccessTokenSilently();
+        const res = await fetch(API_BASE_URL + '/api/restaurante', {
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer ' + accessToken,
+            },
+            body: restaurantFormData
+        });
+        if (!res.ok) {
+            throw new Error("Error al actualizar el restaurante");
+        }
+        return res.json();
+    };
+
+    return useMutation({
+        mutationFn: (restaurante: FormData) => updateRestauranteRequest(restaurante),
+        onError: (err) => {
+            toast.error("Error al actualizar el restaurante");
+            console.log(err);
+        },
+        onSuccess: () => {
+            toast.success("Restaurante actualizado exitosamente");
+            queryClient.invalidateQueries({ queryKey: ['restaurante'] });
+        }
+    });
 }

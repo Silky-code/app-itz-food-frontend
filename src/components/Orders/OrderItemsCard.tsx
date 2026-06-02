@@ -13,17 +13,19 @@ type Props = {
 };
 
 export default function OrderItemsCard({ order }: Props) {
-  const { updateStatusOrder } = useUpdateRestauranteOrder();
+  const updateRestauranteOrderRequest = useUpdateRestauranteOrder();
   const [status, setStatus] = useState<OrderStatus>(order.status);
 
   useEffect(() => {
     setStatus(order.status);
   }, [order.status]);
 
-  const handleStatusChange = async (newStatus: string | null) => {
-    if (!newStatus) return;
-    await updateStatusOrder({ orderId: order._id, status: newStatus });
-    setStatus(newStatus as OrderStatus);
+  const handleStatusChange = async (newStatus: OrderStatus) => {
+    await updateRestauranteOrderRequest.mutateAsync({
+      orderId: order._id,
+      status: newStatus
+    });
+    setStatus(newStatus);
   };
 
   const getTime = () => {
@@ -67,7 +69,7 @@ export default function OrderItemsCard({ order }: Props) {
         </div>
         <div className="flex flex-col space-y-1.5">
           <Label htmlFor="status">¿Cuál es el estado de la orden?</Label>
-          <Select value={status} onValueChange={handleStatusChange}>
+          <Select value={status} onValueChange={(value) => handleStatusChange(value as OrderStatus)}>
             <SelectTrigger id="status">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
